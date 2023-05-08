@@ -76,8 +76,7 @@ public class usuario {
     }
 
    
-    public void InsertarMateria(JTextField paramid, JTextField paramcodigo, JTextField paramnombre, JTextField paramdocente, JTextField paraminicio){
-    setId(Integer.parseInt(paramid.getText()));
+    public void InsertarMateria(JTextField paramcodigo, JTextField paramnombre, JTextField paramdocente, JTextField paraminicio,JTextField paramfin){
     setCodigo(paramcodigo.getText());
     setNombre(paramnombre.getText());
     setDocente(paramdocente.getText());  
@@ -106,11 +105,11 @@ public class usuario {
         paramtabla2.setRowSorter(OrdenarTabla);
         String sql="";
         model.addColumn("Id");
-        model.addColumn("Codigo");
-        model.addColumn("Nombre");
+        model.addColumn("Codigo de materia");
+        model.addColumn("Nombre de materia");
         model.addColumn("Docente");
-        model.addColumn("Inicio");
-        model.addColumn("Fin");
+        model.addColumn("Fecha de Inicio");
+        model.addColumn("Fecha de Fin");
         sql="SELECT * FROM usuario";
         String [] datos= new String[6];
         Statement st;
@@ -131,16 +130,16 @@ public class usuario {
                JOptionPane.showMessageDialog(null,"Error al mostrar los registros!"+e.toString());
         }
     }
-    public void seleccionar(JTable paramtabla2,JTextField paramcodigo,JTextField paramnombre,JTextField paramdocente,JTextField paraminicio,JTextField paramfin){
-     
+    public void seleccionar(JTable paramtabla2,JTextField paramid,JTextField paramcodigo,JTextField paramnombre,JTextField paramdocente,JTextField paraminicio,JTextField paramfin){
         try{
             int fila= paramtabla2.getSelectedRow();
             if(fila>=0){
-                paramcodigo.setText((String) paramtabla2.getValueAt(fila,1));
-                paramnombre.setText((String) paramtabla2.getValueAt(fila,2));
-                paramdocente.setText((String) paramtabla2.getValueAt(fila,3));
-                paraminicio.setText((String) paramtabla2.getValueAt(fila,4));
-                paramfin.setText((String) paramtabla2.getValueAt(fila,5));
+                paramid.setText((String) paramtabla2.getValueAt(fila,0).toString());
+                paramcodigo.setText((String) paramtabla2.getValueAt(fila,1).toString());
+                paramnombre.setText((String) paramtabla2.getValueAt(fila,2).toString());
+                paramdocente.setText((String) paramtabla2.getValueAt(fila,3).toString());
+                paraminicio.setText((String) paramtabla2.getValueAt(fila,4).toString());
+                paramfin.setText((String) paramtabla2.getValueAt(fila,5).toString());
             }
             else{
                JOptionPane.showMessageDialog(null,"Error al mostrar los registros!");
@@ -150,7 +149,8 @@ public class usuario {
         }
         
     }
-    public void modificar(JTextField paramcodigo,JTextField paramnombre,JTextField paramdocente,JTextField paraminicio,JTextField paramfin){
+    public void editar(JTextField paramid,JTextField paramcodigo,JTextField paramnombre,JTextField paramdocente,JTextField paraminicio,JTextField paramfin){
+        setId(Integer.parseInt(paramid.getText()));
         setCodigo(paramcodigo.getText());
         setNombre(paramnombre.getText());
         setDocente(paramdocente.getText());
@@ -158,7 +158,7 @@ public class usuario {
         setFin(paramfin.getText());
         
         conexion objetoConexion= new conexion();
-        String consulta="UPDATE `usuario` SET `id`='?',`codigo`='?',`nombre`='?',`docente`='?',`inicio`='?',`fin`='?' WHERE 'usuario' ";
+        String consulta="UPDATE usuario set usuario.codigo=?,usuario.nombre=?,usuario.docente=?,usuario.inicio=?,usuario.fin=? where usuario.id=?";
         
         try{
             CallableStatement cs= objetoConexion.establecerConexion().prepareCall(consulta);
@@ -167,10 +167,11 @@ public class usuario {
             cs.setString(3, getDocente());
             cs.setString(4, getInicio());
             cs.setString(5,getFin());
+            cs.setInt(6,getId());
             cs.execute();
-       JOptionPane.showMessageDialog(null,"Se creo correctamente!");
+       JOptionPane.showMessageDialog(null,"Se modifico correctamente!");
         }catch(SQLException e){
-            JOptionPane.showMessageDialog(null,"No Se creo correctamente!"+e.toString());
+            JOptionPane.showMessageDialog(null,"No se modifico correctamente!"+e.toString());
         }
         
     }
@@ -179,10 +180,10 @@ public class usuario {
         conexion objetoConexion= new conexion();
          
         
-        String consulta="DELETE FROM usuario WHERE 0";
+        String consulta="DELETE FROM usuario WHERE usuario.id=?";
         try{
             CallableStatement cs= objetoConexion.establecerConexion().prepareCall(consulta);
-            cs.setInt(0, getId());
+            cs.setInt(1, getId());
             cs.execute();
             
        JOptionPane.showMessageDialog(null,"Se elimino correctamente!");
